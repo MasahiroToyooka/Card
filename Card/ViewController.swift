@@ -29,9 +29,18 @@ class ViewController: UIViewController {
     var selectedCardCount: Int = 0
     // ユーザーリスト
     let nameList: [String] = ["津田梅子","ジョージワシントン","ガリレオガリレイ","板垣退助","ジョン万次郎"]
+    
+    
     // 「いいね」をされた名前の配列
     var likedName: [String] = []
-
+    
+    var userList: [[String: String]] = [
+        ["name": "津田梅子", "profession": "教師", "hometown": "千葉"],
+        ["name": "ジョージワシントン", "profession": "大統領", "hometown": "アメリカ"],
+        ["name": "ガリレオガリレイ", "profession": "物理学者", "hometown": "イタリア"],
+        ["name": "板垣退助", "profession": "議員", "hometown": "高知"],
+        ["name": "ジョン万次郎", "profession": "冒険家", "hometown": "アメリカ"]
+    ]
 
     // viewのレイアウト処理が完了した時に呼ばれる
     override func viewDidLayoutSubviews() {

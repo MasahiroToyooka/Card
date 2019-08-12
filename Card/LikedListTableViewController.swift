@@ -27,8 +27,11 @@ class LikedListTableViewController: UITableViewController {
 
     // 必須:セルの設定
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! CustomCell
 
+        cell.nameLabel.text = ""
+        cell.professionLabel.text = ""
+        cell.hometownLabel.text = ""
         // いいねされた名前を表示
         cell.textLabel?.text = likedName[indexPath.row]
         return cell
