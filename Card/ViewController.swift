@@ -34,8 +34,8 @@ class ViewController: UIViewController {
     // ユーザーリスト
     var userList: [[String: String]] = [
         ["imageName": "津田梅子", "name": "津田梅子", "profession": "教師", "hometown": "千葉"],
-        ["imageName": "ジョージワシントン", "name": "ジョージワシントン", "profession": "大統領", "hometown": "アメリカ"],
         ["imageName": "ガリレオガリレイ", "name": "ガリレオガリレイ", "profession": "物理学者", "hometown": "イタリア"],
+        ["imageName": "ジョージワシントン", "name": "ジョージワシントン", "profession": "大統領", "hometown": "アメリカ"],
         ["imageName": "板垣退助", "name": "板垣退助", "profession": "議員", "hometown": "高知"],
         ["imageName": "ジョン万次郎", "name": "ジョン万次郎", "profession": "冒険家", "hometown": "アメリカ"]
     ]
@@ -195,11 +195,7 @@ class ViewController: UIViewController {
                 
                 if selectedCardCount >= personList.count {
                     // 画面遷移
-                    if likedUser.isEmpty {
-                        pushAction()
-                    } else {
-                        performSegue(withIdentifier: "ToLikedList", sender: self)
-                    }
+                    performSegue(withIdentifier: "ToLikedList", sender: self)
                 }
 
             } else {
@@ -251,15 +247,9 @@ class ViewController: UIViewController {
         likedUser.append(userList[selectedCardCount])
         selectedCardCount += 1
    
-        
         if selectedCardCount >= personList.count {
-            
             // 画面遷移
-            if likedUser.isEmpty {
-                pushAction()
-            } else {
-                performSegue(withIdentifier: "ToLikedList", sender: self)
-            }
+            performSegue(withIdentifier: "ToLikedList", sender: self)
         }
     }
 }

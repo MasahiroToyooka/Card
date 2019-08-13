@@ -17,8 +17,6 @@ class LikedListTableViewController: UITableViewController {
         super.viewDidLoad()
         
         tableView.register(UINib(nibName: "CustomCell", bundle: nil), forCellReuseIdentifier: "Cell")
-        
-    
     }
 
     // MARK: - Table view data source
