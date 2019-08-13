@@ -27,11 +27,20 @@ class ViewController: UIViewController {
     var personList: [UIView] = []
     // 選択されたカードの数
     var selectedCardCount: Int = 0
-    // ユーザーリスト
-    let nameList: [String] = ["津田梅子","ジョージワシントン","ガリレオガリレイ","板垣退助","ジョン万次郎"]
+    
     // 「いいね」をされた名前の配列
     var likedName: [String] = []
-
+    
+    // ユーザーリスト
+    var userList: [[String: String]] = [
+        ["imageName": "津田梅子", "name": "津田梅子", "profession": "教師", "hometown": "千葉"],
+        ["imageName": "ガリレオガリレイ", "name": "ガリレオガリレイ", "profession": "物理学者", "hometown": "イタリア"],
+        ["imageName": "ジョージワシントン", "name": "ジョージワシントン", "profession": "大統領", "hometown": "アメリカ"],
+        ["imageName": "板垣退助", "name": "板垣退助", "profession": "議員", "hometown": "高知"],
+        ["imageName": "ジョン万次郎", "name": "ジョン万次郎", "profession": "冒険家", "hometown": "アメリカ"]
+    ]
+    
+    var likedUser: [[String: String]] = []
 
     // viewのレイアウト処理が完了した時に呼ばれる
     override func viewDidLayoutSubviews() {
@@ -55,7 +64,7 @@ class ViewController: UIViewController {
         // カウント初期化
         selectedCardCount = 0
         // リスト初期化
-        likedName = []
+        likedUser = []
     }
 
     // セグエによる遷移前に呼ばれる
@@ -64,8 +73,8 @@ class ViewController: UIViewController {
         if segue.identifier == "ToLikedList" {
             let vc = segue.destination as! LikedListTableViewController
 
-            // LikedListTableViewControllerのlikedName(左)にViewCountrollewのLikedName(右)を代入
-            vc.likedName = likedName
+            // LikedListTableViewControllerのlikedUser(左)にViewCountrollewのlikedUser(右)を代入
+            vc.likedUser = likedUser
         }
     }
 
@@ -90,6 +99,25 @@ class ViewController: UIViewController {
         baseCard.center = centerOfCard
         // 角度を戻す
         baseCard.transform = .identity
+    }
+    
+    // 誰もいいねしなかった時の処理
+    func pushAction() {
+        // UIViewControllerの生成
+        let VC = UIViewController()
+        
+        // ラベルの生成
+        let label = UILabel()
+        // ラベルの位置決め
+        label.frame = CGRect(x: 80, y: 100, width: 200, height: 50)
+        // ラベルのテキストを追加
+        label.text = "まだいいねしていません"
+        // ラベルの貼り付け
+        VC.view.addSubview(label)
+        // UIViewControllerのバックグランドカラーの設定
+        VC.view.backgroundColor = .white
+        // VCへ画面遷移
+        navigationController?.pushViewController(VC, animated: true)
     }
 
     // スワイプ処理
@@ -140,8 +168,12 @@ class ViewController: UIViewController {
                 selectedCardCount += 1
 
                 if selectedCardCount >= personList.count {
-                    // 遷移処理
-                    performSegue(withIdentifier: "ToLikedList", sender: self)
+                    // 画面遷移
+                    if likedUser.isEmpty {
+                        pushAction()
+                    } else {
+                        performSegue(withIdentifier: "ToLikedList", sender: self)
+                    }
                 }
 
             } else if card.center.x > self.view.frame.width - 50 {
@@ -157,12 +189,12 @@ class ViewController: UIViewController {
                 // likeImageを隠す
                 likeImage.isHidden = true
                 // いいねリストに追加
-                likedName.append(nameList[selectedCardCount])
+                likedUser.append(userList[selectedCardCount])
                 // 次のカードへ
                 selectedCardCount += 1
                 
                 if selectedCardCount >= personList.count {
-                    // 遷移処理
+                    // 画面遷移
                     performSegue(withIdentifier: "ToLikedList", sender: self)
                 }
 
@@ -195,7 +227,12 @@ class ViewController: UIViewController {
         selectedCardCount += 1
         // 画面遷移
         if selectedCardCount >= personList.count {
-            performSegue(withIdentifier: "ToLikedList", sender: self)
+            
+            if likedUser.isEmpty {
+                pushAction()
+            } else {
+                performSegue(withIdentifier: "ToLikedList", sender: self)
+            }
         }
     }
 
@@ -207,10 +244,11 @@ class ViewController: UIViewController {
             self.personList[self.selectedCardCount].center = CGPoint(x:self.personList[self.selectedCardCount].center.x + 500, y:self.personList[self.selectedCardCount].center.y)
         })
         // いいねリストに追加
-        likedName.append(nameList[selectedCardCount])
+        likedUser.append(userList[selectedCardCount])
         selectedCardCount += 1
-        // 画面遷移
+   
         if selectedCardCount >= personList.count {
+            // 画面遷移
             performSegue(withIdentifier: "ToLikedList", sender: self)
         }
     }
