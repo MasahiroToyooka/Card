@@ -18,24 +18,7 @@ class LikedListTableViewController: UITableViewController {
         
         tableView.register(UINib(nibName: "CustomCell", bundle: nil), forCellReuseIdentifier: "Cell")
         
-        // 誰もいいねしなかった時の処理
-        if likedUser.isEmpty {
-            // UIViewControllerの生成
-            let VC = UIViewController()
-            
-            // ラベルの生成
-            let label = UILabel()
-            // ラベルの位置決め
-            label.frame = CGRect(x: 80, y: 100, width: 200, height: 50)
-            // ラベルのテキストを追加
-            label.text = "まだいいねしていません"
-            // ラベルの貼り付け
-            VC.view.addSubview(label)
-            // UIViewControllerのバックグランドカラーの設定
-            VC.view.backgroundColor = .white
-            // VCへ画面遷移
-            navigationController?.pushViewController(VC, animated: true)
-        }
+    
     }
 
     // MARK: - Table view data source

@@ -100,6 +100,25 @@ class ViewController: UIViewController {
         // 角度を戻す
         baseCard.transform = .identity
     }
+    
+    // 誰もいいねしなかった時の処理
+    func pushAction() {
+        // UIViewControllerの生成
+        let VC = UIViewController()
+        
+        // ラベルの生成
+        let label = UILabel()
+        // ラベルの位置決め
+        label.frame = CGRect(x: 80, y: 100, width: 200, height: 50)
+        // ラベルのテキストを追加
+        label.text = "まだいいねしていません"
+        // ラベルの貼り付け
+        VC.view.addSubview(label)
+        // UIViewControllerのバックグランドカラーの設定
+        VC.view.backgroundColor = .white
+        // VCへ画面遷移
+        navigationController?.pushViewController(VC, animated: true)
+    }
 
     // スワイプ処理
     @IBAction func swipeCard(_ sender: UIPanGestureRecognizer) {
@@ -149,8 +168,12 @@ class ViewController: UIViewController {
                 selectedCardCount += 1
 
                 if selectedCardCount >= personList.count {
-                    // 遷移処理
-                    performSegue(withIdentifier: "ToLikedList", sender: self)
+                    // 画面遷移
+                    if likedUser.isEmpty {
+                        pushAction()
+                    } else {
+                        performSegue(withIdentifier: "ToLikedList", sender: self)
+                    }
                 }
 
             } else if card.center.x > self.view.frame.width - 50 {
@@ -171,8 +194,12 @@ class ViewController: UIViewController {
                 selectedCardCount += 1
                 
                 if selectedCardCount >= personList.count {
-                    // 遷移処理
-                    performSegue(withIdentifier: "ToLikedList", sender: self)
+                    // 画面遷移
+                    if likedUser.isEmpty {
+                        pushAction()
+                    } else {
+                        performSegue(withIdentifier: "ToLikedList", sender: self)
+                    }
                 }
 
             } else {
@@ -204,7 +231,12 @@ class ViewController: UIViewController {
         selectedCardCount += 1
         // 画面遷移
         if selectedCardCount >= personList.count {
-            performSegue(withIdentifier: "ToLikedList", sender: self)
+            
+            if likedUser.isEmpty {
+                pushAction()
+            } else {
+                performSegue(withIdentifier: "ToLikedList", sender: self)
+            }
         }
     }
 
@@ -218,9 +250,16 @@ class ViewController: UIViewController {
         // いいねリストに追加
         likedUser.append(userList[selectedCardCount])
         selectedCardCount += 1
-        // 画面遷移
+   
+        
         if selectedCardCount >= personList.count {
-            performSegue(withIdentifier: "ToLikedList", sender: self)
+            
+            // 画面遷移
+            if likedUser.isEmpty {
+                pushAction()
+            } else {
+                performSegue(withIdentifier: "ToLikedList", sender: self)
+            }
         }
     }
 }
