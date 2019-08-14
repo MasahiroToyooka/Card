@@ -15,14 +15,14 @@ class ViewController: UIViewController {
     // スワイプ中にgood or bad の表示
     @IBOutlet weak var likeImage: UIImageView!
     // ユーザーカード
-    @IBOutlet weak var person4: UIView!
+    @IBOutlet weak var firstView: UIView!
     @IBOutlet weak var firstImageView: UIImageView!
     @IBOutlet weak var firstNameLabel: UILabel!
     @IBOutlet weak var firstProfessionLabel: UILabel!
     @IBOutlet weak var firstHomeTownLabel: UILabel!
     
     
-    @IBOutlet weak var person5: UIView!
+    @IBOutlet weak var secondView: UIView!
     @IBOutlet weak var secondImageView: UIImageView!
     @IBOutlet weak var secondNameLabel: UILabel!
     @IBOutlet weak var secondProfessionLabel: UILabel!
@@ -31,9 +31,12 @@ class ViewController: UIViewController {
     // ベースカードの中心
     var centerOfCard: CGPoint!
     // ユーザーカードの配列
-    var personList: [UIView] = []
+    var cardList: [UIView] = []
     // 選択されたカードの数
     var selectedCardCount: Int = 0
+    
+    var currentNum: Int = 0
+    
     // ユーザーリスト
     let nameList: [String] = ["津田梅子","ジョージワシントン","ガリレオガリレイ","板垣退助","ジョン万次郎"]
     // 「いいね」をされた名前の配列
@@ -57,8 +60,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // personListに追加
-        personList.append(person4)
-        personList.append(person5)
+        cardList.append(firstView)
+        cardList.append(secondView)
     }
 
     // view表示前に呼ばれる（遷移すると戻ってくる度によばれる）
@@ -88,7 +91,7 @@ class ViewController: UIViewController {
 
     func resetPersonList() {
         // 5人の飛んで行ったビューを元の位置に戻す
-        for person in personList {
+        for person in cardList {
             // 元に戻す処理
             person.center = self.centerOfCard
             person.transform = .identity
@@ -102,6 +105,49 @@ class ViewController: UIViewController {
         // 角度を戻す
         baseCard.transform = .identity
     }
+    
+    func setupNextView() {
+        // 背面に持っていく
+        self.view.sendSubviewToBack(cardList[selectedCardCount])
+        
+        // 中央に戻す
+        cardList[selectedCardCount].center = centerOfCard
+        cardList[selectedCardCount].transform = .identity
+        
+        setupCardData()
+        
+        // 次のカードへ
+        selectedCardCount += 1
+        
+        currentNum += 1
+
+        
+        selectedCardCount = currentNum % 2
+    }
+    
+    func setupCardData() {
+        
+        if currentNum > userList.count - 3 {
+            // 遷移処理
+            performSegue(withIdentifier: "ToLikedList", sender: self)
+        } else {
+            let userData: [String: Any] = userList[currentNum + 2]
+            
+            if selectedCardCount == 0 {
+                firstImageView.image      = UIImage(named: userData["name"] as! String)
+                firstNameLabel.text       = userData["name"] as? String
+                firstProfessionLabel.text = userData["profession"] as? String
+                firstHomeTownLabel.text   = userData["hometown"] as? String
+                firstView.backgroundColor = userData["backgroundColor"] as? UIColor
+                
+            } else {
+                secondImageView.image      = UIImage(named: userData["name"] as! String)
+                secondNameLabel.text       = userData["name"] as? String
+                secondProfessionLabel.text = userData["profession"] as? String
+                secondHomeTownLabel.text   = userData["hometown"] as? String
+            }
+        }
+    }
 
     // スワイプ処理
     @IBAction func swipeCard(_ sender: UIPanGestureRecognizer) {
@@ -113,19 +159,20 @@ class ViewController: UIViewController {
         // 取得できた距離をcard.centerに加算
         card.center = CGPoint(x: card.center.x + point.x, y: card.center.y + point.y)
         // ユーザーカードにも同じ動きをさせる
-        personList[selectedCardCount].center = CGPoint(x: card.center.x + point.x, y:card.center.y + point.y)
+        cardList[selectedCardCount].center = CGPoint(x: card.center.x + point.x, y:card.center.y + point.y)
         // 元々の位置と移動先との差
         let xfromCenter = card.center.x - view.center.x
         // 角度をつける処理
         card.transform = CGAffineTransform(rotationAngle: xfromCenter / (view.frame.width / 2) * -0.785)
         // ユーザーカードに角度をつける
-        personList[selectedCardCount].transform = CGAffineTransform(rotationAngle: xfromCenter / (view.frame.width / 2) * -0.785)
+        cardList[selectedCardCount].transform = CGAffineTransform(rotationAngle: xfromCenter / (view.frame.width / 2) * -0.785)
 
         // likeImageの表示のコントロール
         if xfromCenter > 0 {
             // goodを表示
             likeImage.image = #imageLiteral(resourceName: "いいね")
             likeImage.isHidden = false
+          
         } else if xfromCenter < 0 {
             // badを表示
             likeImage.image = #imageLiteral(resourceName: "よくないね")
@@ -140,17 +187,18 @@ class ViewController: UIViewController {
                 UIView.animate(withDuration: 0.5, animations: {
                     // 左へ飛ばす場合
                     // X座標を左に500とばす(-500)
-                    self.personList[self.selectedCardCount].center = CGPoint(x: self.personList[self.selectedCardCount].center.x - 500, y :self.personList[self.selectedCardCount].center.y)
+                    self.cardList[self.selectedCardCount].center = CGPoint(x: self.cardList[self.selectedCardCount].center.x - 500, y :self.cardList[self.selectedCardCount].center.y)
 
                 })
                 // ベースカードの角度と位置を戻す
                 resetCard()
                 // likeImageを隠す
                 likeImage.isHidden = true
-                // 次のカードへ
-                selectedCardCount += 1
+                
+                // ユーザーカードを元に戻す
+                setupNextView()
 
-                if selectedCardCount >= personList.count {
+                if currentNum >= userList.count {
                     // 遷移処理
                     performSegue(withIdentifier: "ToLikedList", sender: self)
                 }
@@ -160,19 +208,19 @@ class ViewController: UIViewController {
                 UIView.animate(withDuration: 0.5, animations: {
                     // 右へ飛ばす場合
                     // X座標を右に500とばす(+500)
-                self.personList[self.selectedCardCount].center = CGPoint(x: self.personList[self.selectedCardCount].center.x + 500, y :self.personList[self.selectedCardCount].center.y)
+                self.cardList[self.selectedCardCount].center = CGPoint(x: self.cardList[self.selectedCardCount].center.x + 500, y :self.cardList[self.selectedCardCount].center.y)
 
                 })
                 // ベースカードの角度と位置を戻す
                 resetCard()
                 // likeImageを隠す
                 likeImage.isHidden = true
+                // ユーザーカードを元に戻す
+                setupNextView()
                 // いいねリストに追加
                 likedName.append(nameList[selectedCardCount])
-                // 次のカードへ
-                selectedCardCount += 1
                 
-                if selectedCardCount >= personList.count {
+                if currentNum >= userList.count {
                     // 遷移処理
                     performSegue(withIdentifier: "ToLikedList", sender: self)
                 }
@@ -181,9 +229,9 @@ class ViewController: UIViewController {
                 // アニメーションをつける
                 UIView.animate(withDuration: 0.5, animations: {
                     // ユーザーカードを元の位置に戻す
-                    self.personList[self.selectedCardCount].center = self.centerOfCard
+                    self.cardList[self.selectedCardCount].center = self.centerOfCard
                     // ユーザーカードの角度を元の位置に戻す
-                    self.personList[self.selectedCardCount].transform = .identity
+                    self.cardList[self.selectedCardCount].transform = .identity
                     // ベースカードの角度と位置を戻す
                     self.resetCard()
                     // likeImageを隠す
@@ -200,12 +248,14 @@ class ViewController: UIViewController {
             // ベースカードをリセット
             self.resetCard()
             // ユーザーカードを左にとばす
-            self.personList[self.selectedCardCount].center = CGPoint(x:self.personList[self.selectedCardCount].center.x - 500, y:self.personList[self.selectedCardCount].center.y)
+            self.cardList[self.selectedCardCount].center = CGPoint(x:self.cardList[self.selectedCardCount].center.x - 500, y:self.cardList[self.selectedCardCount].center.y)
         })
+        
+        // ユーザーカードを元に戻す
+        setupNextView()
 
-        selectedCardCount += 1
         // 画面遷移
-        if selectedCardCount >= personList.count {
+        if currentNum >= userList.count {
             performSegue(withIdentifier: "ToLikedList", sender: self)
         }
     }
@@ -215,13 +265,18 @@ class ViewController: UIViewController {
 
         UIView.animate(withDuration: 0.5, animations: {
             self.resetCard()
-            self.personList[self.selectedCardCount].center = CGPoint(x:self.personList[self.selectedCardCount].center.x + 500, y:self.personList[self.selectedCardCount].center.y)
+            self.cardList[self.selectedCardCount].center = CGPoint(x:self.cardList[self.selectedCardCount].center.x + 500, y:self.cardList[self.selectedCardCount].center.y)
         })
         // いいねリストに追加
         likedName.append(nameList[selectedCardCount])
-        selectedCardCount += 1
+        
+        // ユーザーカードを元に戻す
+        setupNextView()
+        
+        
+        
         // 画面遷移
-        if selectedCardCount >= personList.count {
+        if currentNum >= userList.count {
             performSegue(withIdentifier: "ToLikedList", sender: self)
         }
     }
