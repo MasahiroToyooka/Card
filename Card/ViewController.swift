@@ -15,12 +15,19 @@ class ViewController: UIViewController {
     // スワイプ中にgood or bad の表示
     @IBOutlet weak var likeImage: UIImageView!
     // ユーザーカード
-    @IBOutlet weak var person1: UIView!
-    @IBOutlet weak var person2: UIView!
-    @IBOutlet weak var person3: UIView!
     @IBOutlet weak var person4: UIView!
+    @IBOutlet weak var firstImageView: UIImageView!
+    @IBOutlet weak var firstNameLabel: UILabel!
+    @IBOutlet weak var firstProfessionLabel: UILabel!
+    @IBOutlet weak var firstHomeTownLabel: UILabel!
+    
+    
     @IBOutlet weak var person5: UIView!
-
+    @IBOutlet weak var secondImageView: UIImageView!
+    @IBOutlet weak var secondNameLabel: UILabel!
+    @IBOutlet weak var secondProfessionLabel: UILabel!
+    @IBOutlet weak var secondHomeTownLabel: UILabel!
+    
     // ベースカードの中心
     var centerOfCard: CGPoint!
     // ユーザーカードの配列
@@ -32,6 +39,13 @@ class ViewController: UIViewController {
     // 「いいね」をされた名前の配列
     var likedName: [String] = []
 
+    let userList: [[String: Any]] = [
+        ["name": "津田梅子", "profession": "教師", "hometown": "千葉", "backgroundColor": #colorLiteral(red: 0.2084727883, green: 1, blue: 0.8079068065, alpha: 1)],
+        ["name": "ジョージワシントン", "profession": "大統領", "hometown": "アメリカ", "backgroundColor": #colorLiteral(red: 0.2084727883, green: 1, blue: 0.8079068065, alpha: 1)],
+        ["name": "ガリレオガリレイ", "profession": "物理学者", "hometown": "イタリア", "backgroundColor": #colorLiteral(red: 0.2084727883, green: 1, blue: 0.8079068065, alpha: 1)],
+        ["name": "板垣退助", "profession": "議員", "hometown": "高知", "backgroundColor": #colorLiteral(red: 0.2084727883, green: 1, blue: 0.8079068065, alpha: 1)],
+        ["name": "ジョン万次郎", "profession": "冒険家", "hometown": "アメリカ", "backgroundColor": #colorLiteral(red: 0.2084727883, green: 1, blue: 0.8079068065, alpha: 1)]
+    ]
 
     // viewのレイアウト処理が完了した時に呼ばれる
     override func viewDidLayoutSubviews() {
@@ -42,10 +56,7 @@ class ViewController: UIViewController {
     // ロード完了時に呼ばれる
     override func viewDidLoad() {
         super.viewDidLoad()
-        // personListにperson1から5を追加
-        personList.append(person1)
-        personList.append(person2)
-        personList.append(person3)
+        // personListに追加
         personList.append(person4)
         personList.append(person5)
     }
