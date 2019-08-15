@@ -48,7 +48,7 @@ class ViewController: UIViewController {
         ["name": "津田梅子", "job": "教師", "hometown": "千葉", "backgroundColor": #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)],
         ["name": "ジョージワシントン", "job": "大統領", "hometown": "アメリカ", "backgroundColor": #colorLiteral(red: 0.2196078449, green: 0.007843137719, blue: 0.8549019694, alpha: 1)],
         ["name": "ガリレオガリレイ", "job": "物理学者", "hometown": "イタリア", "backgroundColor": #colorLiteral(red: 0.8078431487, green: 0.02745098062, blue: 0.3333333433, alpha: 1)],
-        ["name": "板垣退助", "job": "議員", "hometown": "高知", "backgroundColor": #colorLiteral(red: 0.9607843161, green: 0.7058823705, blue: 0.200000003, alpha: 1)],
+        ["name": "板垣退助", "job": "議員", "hometown": "高知", "backgroundColor": #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)],
         ["name": "ジョン万次郎", "job": "冒険家", "hometown": "アメリカ", "backgroundColor": #colorLiteral(red: 0.4666666687, green: 0.7647058964, blue: 0.2666666806, alpha: 1)]
     ]
 
@@ -64,6 +64,8 @@ class ViewController: UIViewController {
         // personListに追加
         cardList.append(firstView)
         cardList.append(secondView)
+        
+        setupCardData(indicateNum: currentNum, reset: true)
     }
 
     // セグエによる遷移前に呼ばれる
@@ -77,7 +79,7 @@ class ViewController: UIViewController {
         }
     }
 
-    // 完全に遷移が行われ、スクリーン上からViewControllerが表示されなくなったときに呼ばれる
+    // ViewControllerが表示されなくなったときに呼ばれる
     override func viewDidDisappear(_ animated: Bool) {
         // ユーザーカードを元に戻す
         resetPersonList()
@@ -87,6 +89,10 @@ class ViewController: UIViewController {
         // リスト初期化
         likedName = []
         
+        // viewの順番を元に戻す
+        self.view.sendSubviewToBack(secondView)
+        
+        // カードに乗っている情報を元に戻す
         setupCardData(indicateNum: currentNum, reset: true)
     }
 
@@ -107,6 +113,7 @@ class ViewController: UIViewController {
         baseCard.transform = .identity
     }
     
+    // 次のカード設定
     func setupNextView() {
         // 背面に持っていく
         self.view.sendSubviewToBack(cardList[selectedCardNum])
@@ -115,6 +122,7 @@ class ViewController: UIViewController {
         cardList[selectedCardNum].center = centerOfCard
         cardList[selectedCardNum].transform = .identity
         
+        // データの更新は3枚目からするので調整
         if currentNum + 2 < userList.count {
             
             setupCardData(indicateNum: currentNum + 2, reset: false)
@@ -128,6 +136,7 @@ class ViewController: UIViewController {
         selectedCardNum += 1
         currentNum += 1
         
+        //
         if currentNum >= userList.count {
             // 遷移処理
             return performSegue(withIdentifier: "ToLikedList", sender: self)
@@ -135,12 +144,15 @@ class ViewController: UIViewController {
         selectedCardNum = currentNum % 2
     }
     
+    // カードに情報を乗せる関数
     func setupCardData(indicateNum: Int, reset: Bool) {
-        
         
         let userData: [String: Any] = userList[indicateNum]
         
+    
         if reset {
+            // カード内容をリセットするやつ
+            
             secondView.alpha = 1
             
             firstImageView.image      = UIImage(named: userList[indicateNum]["name"] as! String)
@@ -149,13 +161,14 @@ class ViewController: UIViewController {
             firstHomeTownLabel.text   = userList[indicateNum]["hometown"] as? String
             firstView.backgroundColor = userList[indicateNum]["backgroundColor"] as? UIColor
             
-            secondImageView.image     = UIImage(named: userList[indicateNum + 1]["name"] as!                                String)
-            secondNameLabel.text      = userList[indicateNum + 1]["name"] as? String
-            secondJobLabel.text       = userList[indicateNum + 1]["job"] as? String
-            secondHomeTownLabel.text  = userList[indicateNum + 1]["hometown"] as? String
+            secondImageView.image      = UIImage(named: userList[indicateNum + 1]["name"] as!                                String)
+            secondNameLabel.text       = userList[indicateNum + 1]["name"] as? String
+            secondJobLabel.text        = userList[indicateNum + 1]["job"] as? String
+            secondHomeTownLabel.text   = userList[indicateNum + 1]["hometown"] as? String
+            secondView.backgroundColor = userList[indicateNum + 1]["backgroundColor"] as? UIColor
         } else {
-            
             if selectedCardNum == 0 {
+                // firstViewのデータ更新
                 firstImageView.image      = UIImage(named: userData["name"] as! String)
                 firstNameLabel.text       = userData["name"] as? String
                 firstJobLabel.text        = userData["job"] as? String
@@ -163,6 +176,7 @@ class ViewController: UIViewController {
                 firstView.backgroundColor = userData["backgroundColor"] as? UIColor
                 
             } else {
+                // secondViewのデータ更新
                 secondImageView.image    = UIImage(named: userData["name"] as! String)
                 secondNameLabel.text     = userData["name"] as? String
                 secondJobLabel.text      = userData["job"] as? String
