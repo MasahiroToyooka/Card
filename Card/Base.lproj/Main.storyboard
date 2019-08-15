@@ -170,14 +170,14 @@
                         <outlet property="baseCard" destination="KFX-1B-6vk" id="kN8-3M-3dm"/>
                         <outlet property="firstHomeTownLabel" destination="i5p-cK-Lym" id="GQa-1m-33d"/>
                         <outlet property="firstImageView" destination="o2E-Zs-U4e" id="Zww-no-WiG"/>
+                        <outlet property="firstJobLabel" destination="g6x-tS-d7s" id="TH9-ku-TTp"/>
                         <outlet property="firstNameLabel" destination="zhZ-10-56D" id="1xI-y0-mz6"/>
-                        <outlet property="firstProfessionLabel" destination="g6x-tS-d7s" id="TH9-ku-TTp"/>
                         <outlet property="firstView" destination="zuF-6g-1Pp" id="D8N-UN-vXe"/>
                         <outlet property="likeImage" destination="Njy-qQ-WMP" id="BEp-4f-DE6"/>
                         <outlet property="secondHomeTownLabel" destination="zUW-Xn-Bah" id="8pe-qG-E52"/>
                         <outlet property="secondImageView" destination="n9e-Eh-gEq" id="DX9-XS-1kA"/>
+                        <outlet property="secondJobLabel" destination="aPz-FW-DQz" id="p7I-iB-k7A"/>
                         <outlet property="secondNameLabel" destination="hOw-yY-I27" id="qwY-D3-8zK"/>
-                        <outlet property="secondProfessionLabel" destination="aPz-FW-DQz" id="p7I-iB-k7A"/>
                         <outlet property="secondView" destination="Me7-7N-lAE" id="zLB-ia-IXM"/>
                         <segue destination="HJZ-Rr-xTd" kind="show" identifier="ToLikedList" id="e2h-Zu-Eti"/>
                     </connections>

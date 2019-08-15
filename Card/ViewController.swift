@@ -19,14 +19,14 @@ class ViewController: UIViewController {
     @IBOutlet weak var firstView: UIView!
     @IBOutlet weak var firstImageView: UIImageView!
     @IBOutlet weak var firstNameLabel: UILabel!
-    @IBOutlet weak var firstProfessionLabel: UILabel!
+    @IBOutlet weak var firstJobLabel: UILabel!
     @IBOutlet weak var firstHomeTownLabel: UILabel!
     
     // 2枚目のユーザーカード
     @IBOutlet weak var secondView: UIView!
     @IBOutlet weak var secondImageView: UIImageView!
     @IBOutlet weak var secondNameLabel: UILabel!
-    @IBOutlet weak var secondProfessionLabel: UILabel!
+    @IBOutlet weak var secondJobLabel: UILabel!
     @IBOutlet weak var secondHomeTownLabel: UILabel!
     
     // ベースカードの中心
@@ -35,7 +35,7 @@ class ViewController: UIViewController {
     var cardList: [UIView] = []
     
     /// firstviewかsecondViewかを表す数字
-    var selectedCardCount: Int = 0
+    var selectedCardNum: Int = 0
     
     /// 何番目のカードかを表す数字
     var currentNum: Int = 0
@@ -45,11 +45,11 @@ class ViewController: UIViewController {
 
     // ユーザーリスト
     let userList: [[String: Any]] = [
-        ["name": "津田梅子", "profession": "教師", "hometown": "千葉", "backgroundColor": #colorLiteral(red: 0.2084727883, green: 1, blue: 0.8079068065, alpha: 1)],
-        ["name": "ジョージワシントン", "profession": "大統領", "hometown": "アメリカ", "backgroundColor": #colorLiteral(red: 0.2084727883, green: 1, blue: 0.8079068065, alpha: 1)],
-        ["name": "ガリレオガリレイ", "profession": "物理学者", "hometown": "イタリア", "backgroundColor": #colorLiteral(red: 0.2084727883, green: 1, blue: 0.8079068065, alpha: 1)],
-        ["name": "板垣退助", "profession": "議員", "hometown": "高知", "backgroundColor": #colorLiteral(red: 0.2084727883, green: 1, blue: 0.8079068065, alpha: 1)],
-        ["name": "ジョン万次郎", "profession": "冒険家", "hometown": "アメリカ", "backgroundColor": #colorLiteral(red: 0.2084727883, green: 1, blue: 0.8079068065, alpha: 1)]
+        ["name": "津田梅子", "job": "教師", "hometown": "千葉", "backgroundColor": #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)],
+        ["name": "ジョージワシントン", "job": "大統領", "hometown": "アメリカ", "backgroundColor": #colorLiteral(red: 0.2196078449, green: 0.007843137719, blue: 0.8549019694, alpha: 1)],
+        ["name": "ガリレオガリレイ", "job": "物理学者", "hometown": "イタリア", "backgroundColor": #colorLiteral(red: 0.8078431487, green: 0.02745098062, blue: 0.3333333433, alpha: 1)],
+        ["name": "板垣退助", "job": "議員", "hometown": "高知", "backgroundColor": #colorLiteral(red: 0.9607843161, green: 0.7058823705, blue: 0.200000003, alpha: 1)],
+        ["name": "ジョン万次郎", "job": "冒険家", "hometown": "アメリカ", "backgroundColor": #colorLiteral(red: 0.4666666687, green: 0.7647058964, blue: 0.2666666806, alpha: 1)]
     ]
 
     // viewのレイアウト処理が完了した時に呼ばれる
@@ -64,14 +64,6 @@ class ViewController: UIViewController {
         // personListに追加
         cardList.append(firstView)
         cardList.append(secondView)
-    }
-
-    // view表示前に呼ばれる（遷移すると戻ってくる度によばれる）
-    override func viewWillAppear(_ animated: Bool) {
-        // カウント初期化
-        selectedCardCount = 0
-        // リスト初期化
-        likedName = []
     }
 
     // セグエによる遷移前に呼ばれる
@@ -89,6 +81,13 @@ class ViewController: UIViewController {
     override func viewDidDisappear(_ animated: Bool) {
         // ユーザーカードを元に戻す
         resetPersonList()
+        // カウント初期化
+        selectedCardNum = 0
+        currentNum = 0
+        // リスト初期化
+        likedName = []
+        
+        setupCardData(indicateNum: currentNum, reset: true)
     }
 
     func resetPersonList() {
@@ -109,46 +108,66 @@ class ViewController: UIViewController {
     }
     
     func setupNextView() {
+        // 背面に持っていく
+        self.view.sendSubviewToBack(cardList[selectedCardNum])
+    
+        // 中央に戻す
+        cardList[selectedCardNum].center = centerOfCard
+        cardList[selectedCardNum].transform = .identity
         
-        guard currentNum - 2 >= userList.count else {
+        if currentNum + 2 < userList.count {
+            
+            setupCardData(indicateNum: currentNum + 2, reset: false)
+        } else {
+            // secondViewの４番目の板垣
+            // 背面のビューを見えなくする
+            secondView.alpha = 0
+        }
+        
+        // 更新する処理
+        selectedCardNum += 1
+        currentNum += 1
+        
+        if currentNum >= userList.count {
             // 遷移処理
             return performSegue(withIdentifier: "ToLikedList", sender: self)
         }
-        
-        // 背面に持っていく
-        self.view.sendSubviewToBack(cardList[selectedCardCount])
-        
-        // 中央に戻す
-        cardList[selectedCardCount].center = centerOfCard
-        cardList[selectedCardCount].transform = .identity
-        
-        setupCardData()
-        
-        // 次のカードへ
-        selectedCardCount += 1
-        
-        currentNum += 1
-
-        
-        selectedCardCount = currentNum % 2
+        selectedCardNum = currentNum % 2
     }
     
-    func setupCardData() {
+    func setupCardData(indicateNum: Int, reset: Bool) {
         
-        let userData: [String: Any] = userList[currentNum]
         
-        if selectedCardCount == 0 {
-            firstImageView.image      = UIImage(named: userData["name"] as! String)
-            firstNameLabel.text       = userData["name"] as? String
-            firstProfessionLabel.text = userData["profession"] as? String
-            firstHomeTownLabel.text   = userData["hometown"] as? String
-            firstView.backgroundColor = userData["backgroundColor"] as? UIColor
+        let userData: [String: Any] = userList[indicateNum]
+        
+        if reset {
+            secondView.alpha = 1
             
+            firstImageView.image      = UIImage(named: userList[indicateNum]["name"] as! String)
+            firstNameLabel.text       = userList[indicateNum]["name"] as? String
+            firstJobLabel.text        = userList[indicateNum]["job"] as? String
+            firstHomeTownLabel.text   = userList[indicateNum]["hometown"] as? String
+            firstView.backgroundColor = userList[indicateNum]["backgroundColor"] as? UIColor
+            
+            secondImageView.image     = UIImage(named: userList[indicateNum + 1]["name"] as!                                String)
+            secondNameLabel.text      = userList[indicateNum + 1]["name"] as? String
+            secondJobLabel.text       = userList[indicateNum + 1]["job"] as? String
+            secondHomeTownLabel.text  = userList[indicateNum + 1]["hometown"] as? String
         } else {
-            secondImageView.image      = UIImage(named: userData["name"] as! String)
-            secondNameLabel.text       = userData["name"] as? String
-            secondProfessionLabel.text = userData["profession"] as? String
-            secondHomeTownLabel.text   = userData["hometown"] as? String
+            
+            if selectedCardNum == 0 {
+                firstImageView.image      = UIImage(named: userData["name"] as! String)
+                firstNameLabel.text       = userData["name"] as? String
+                firstJobLabel.text        = userData["job"] as? String
+                firstHomeTownLabel.text   = userData["hometown"] as? String
+                firstView.backgroundColor = userData["backgroundColor"] as? UIColor
+                
+            } else {
+                secondImageView.image    = UIImage(named: userData["name"] as! String)
+                secondNameLabel.text     = userData["name"] as? String
+                secondJobLabel.text      = userData["job"] as? String
+                secondHomeTownLabel.text = userData["hometown"] as? String
+            }
         }
     }
 
@@ -162,13 +181,13 @@ class ViewController: UIViewController {
         // 取得できた距離をcard.centerに加算
         card.center = CGPoint(x: card.center.x + point.x, y: card.center.y + point.y)
         // ユーザーカードにも同じ動きをさせる
-        cardList[selectedCardCount].center = CGPoint(x: card.center.x + point.x, y:card.center.y + point.y)
+        cardList[selectedCardNum].center = CGPoint(x: card.center.x + point.x, y:card.center.y + point.y)
         // 元々の位置と移動先との差
         let xfromCenter = card.center.x - view.center.x
         // 角度をつける処理
         card.transform = CGAffineTransform(rotationAngle: xfromCenter / (view.frame.width / 2) * -0.785)
         // ユーザーカードに角度をつける
-        cardList[selectedCardCount].transform = CGAffineTransform(rotationAngle: xfromCenter / (view.frame.width / 2) * -0.785)
+        cardList[selectedCardNum].transform = CGAffineTransform(rotationAngle: xfromCenter / (view.frame.width / 2) * -0.785)
 
         // likeImageの表示のコントロール
         if xfromCenter > 0 {
@@ -190,8 +209,7 @@ class ViewController: UIViewController {
                 UIView.animate(withDuration: 0.5, animations: {
                     // 左へ飛ばす場合
                     // X座標を左に500とばす(-500)
-                    self.cardList[self.selectedCardCount].center = CGPoint(x: self.cardList[self.selectedCardCount].center.x - 500, y :self.cardList[self.selectedCardCount].center.y)
-
+                    self.cardList[self.selectedCardNum].center = CGPoint(x: self.cardList[self.selectedCardNum].center.x - 500, y :self.cardList[self.selectedCardNum].center.y)
                 })
                 // ベースカードの角度と位置を戻す
                 resetCard()
@@ -206,25 +224,26 @@ class ViewController: UIViewController {
                 UIView.animate(withDuration: 0.5, animations: {
                     // 右へ飛ばす場合
                     // X座標を右に500とばす(+500)
-                self.cardList[self.selectedCardCount].center = CGPoint(x: self.cardList[self.selectedCardCount].center.x + 500, y :self.cardList[self.selectedCardCount].center.y)
-
+                self.cardList[self.selectedCardNum].center = CGPoint(x: self.cardList[self.selectedCardNum].center.x + 500, y :self.cardList[self.selectedCardNum].center.y)
                 })
                 // ベースカードの角度と位置を戻す
                 resetCard()
                 // likeImageを隠す
                 likeImage.isHidden = true
-                // ユーザーカードを元に戻す
-                setupNextView()
+                
                 // いいねリストに追加
                 likedName.append(userList[currentNum]["name"] as! String)
-
+                
+                // ユーザーカードを表示させる
+                setupNextView()
+              
             } else {
                 // アニメーションをつける
                 UIView.animate(withDuration: 0.5, animations: {
                     // ユーザーカードを元の位置に戻す
-                    self.cardList[self.selectedCardCount].center = self.centerOfCard
+                    self.cardList[self.selectedCardNum].center = self.centerOfCard
                     // ユーザーカードの角度を元の位置に戻す
-                    self.cardList[self.selectedCardCount].transform = .identity
+                    self.cardList[self.selectedCardNum].transform = .identity
                     // ベースカードの角度と位置を戻す
                     self.resetCard()
                     // likeImageを隠す
@@ -241,7 +260,7 @@ class ViewController: UIViewController {
             // ベースカードをリセット
             self.resetCard()
             // ユーザーカードを左にとばす
-            self.cardList[self.selectedCardCount].center = CGPoint(x:self.cardList[self.selectedCardCount].center.x - 500, y:self.cardList[self.selectedCardCount].center.y)
+            self.cardList[self.selectedCardNum].center = CGPoint(x:self.cardList[self.selectedCardNum].center.x - 500, y:self.cardList[self.selectedCardNum].center.y)
         })
         
         // ユーザーカードを元に戻す
@@ -253,7 +272,7 @@ class ViewController: UIViewController {
 
         UIView.animate(withDuration: 0.5, animations: {
             self.resetCard()
-            self.cardList[self.selectedCardCount].center = CGPoint(x:self.cardList[self.selectedCardCount].center.x + 500, y:self.cardList[self.selectedCardCount].center.y)
+            self.cardList[self.selectedCardNum].center = CGPoint(x:self.cardList[self.selectedCardNum].center.x + 500, y:self.cardList[self.selectedCardNum].center.y)
         })
         // いいねリストに追加
         likedName.append(userList[currentNum]["name"] as! String)
