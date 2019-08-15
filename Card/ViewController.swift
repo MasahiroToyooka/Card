@@ -14,14 +14,15 @@ class ViewController: UIViewController {
     @IBOutlet weak var baseCard: UIView!
     // スワイプ中にgood or bad の表示
     @IBOutlet weak var likeImage: UIImageView!
-    // ユーザーカード
+    
+    // 一枚目のユーザーカード
     @IBOutlet weak var firstView: UIView!
     @IBOutlet weak var firstImageView: UIImageView!
     @IBOutlet weak var firstNameLabel: UILabel!
     @IBOutlet weak var firstProfessionLabel: UILabel!
     @IBOutlet weak var firstHomeTownLabel: UILabel!
     
-    
+    // 2枚目のユーザーカード
     @IBOutlet weak var secondView: UIView!
     @IBOutlet weak var secondImageView: UIImageView!
     @IBOutlet weak var secondNameLabel: UILabel!
@@ -32,16 +33,17 @@ class ViewController: UIViewController {
     var centerOfCard: CGPoint!
     // ユーザーカードの配列
     var cardList: [UIView] = []
-    // 選択されたカードの数
+    
+    /// firstviewかsecondViewかを表す数字
     var selectedCardCount: Int = 0
     
+    /// 何番目のカードかを表す数字
     var currentNum: Int = 0
     
-    // ユーザーリスト
-    let nameList: [String] = ["津田梅子","ジョージワシントン","ガリレオガリレイ","板垣退助","ジョン万次郎"]
     // 「いいね」をされた名前の配列
     var likedName: [String] = []
 
+    // ユーザーリスト
     let userList: [[String: Any]] = [
         ["name": "津田梅子", "profession": "教師", "hometown": "千葉", "backgroundColor": #colorLiteral(red: 0.2084727883, green: 1, blue: 0.8079068065, alpha: 1)],
         ["name": "ジョージワシントン", "profession": "大統領", "hometown": "アメリカ", "backgroundColor": #colorLiteral(red: 0.2084727883, green: 1, blue: 0.8079068065, alpha: 1)],
@@ -107,6 +109,12 @@ class ViewController: UIViewController {
     }
     
     func setupNextView() {
+        
+        guard currentNum - 2 >= userList.count else {
+            // 遷移処理
+            return performSegue(withIdentifier: "ToLikedList", sender: self)
+        }
+        
         // 背面に持っていく
         self.view.sendSubviewToBack(cardList[selectedCardCount])
         
@@ -127,25 +135,20 @@ class ViewController: UIViewController {
     
     func setupCardData() {
         
-        if currentNum > userList.count - 3 {
-            // 遷移処理
-            performSegue(withIdentifier: "ToLikedList", sender: self)
-        } else {
-            let userData: [String: Any] = userList[currentNum + 2]
+        let userData: [String: Any] = userList[currentNum]
+        
+        if selectedCardCount == 0 {
+            firstImageView.image      = UIImage(named: userData["name"] as! String)
+            firstNameLabel.text       = userData["name"] as? String
+            firstProfessionLabel.text = userData["profession"] as? String
+            firstHomeTownLabel.text   = userData["hometown"] as? String
+            firstView.backgroundColor = userData["backgroundColor"] as? UIColor
             
-            if selectedCardCount == 0 {
-                firstImageView.image      = UIImage(named: userData["name"] as! String)
-                firstNameLabel.text       = userData["name"] as? String
-                firstProfessionLabel.text = userData["profession"] as? String
-                firstHomeTownLabel.text   = userData["hometown"] as? String
-                firstView.backgroundColor = userData["backgroundColor"] as? UIColor
-                
-            } else {
-                secondImageView.image      = UIImage(named: userData["name"] as! String)
-                secondNameLabel.text       = userData["name"] as? String
-                secondProfessionLabel.text = userData["profession"] as? String
-                secondHomeTownLabel.text   = userData["hometown"] as? String
-            }
+        } else {
+            secondImageView.image      = UIImage(named: userData["name"] as! String)
+            secondNameLabel.text       = userData["name"] as? String
+            secondProfessionLabel.text = userData["profession"] as? String
+            secondHomeTownLabel.text   = userData["hometown"] as? String
         }
     }
 
@@ -198,11 +201,6 @@ class ViewController: UIViewController {
                 // ユーザーカードを元に戻す
                 setupNextView()
 
-                if currentNum >= userList.count {
-                    // 遷移処理
-                    performSegue(withIdentifier: "ToLikedList", sender: self)
-                }
-
             } else if card.center.x > self.view.frame.width - 50 {
                 // 右に大きくスワイプしたときの処理
                 UIView.animate(withDuration: 0.5, animations: {
@@ -218,12 +216,7 @@ class ViewController: UIViewController {
                 // ユーザーカードを元に戻す
                 setupNextView()
                 // いいねリストに追加
-                likedName.append(nameList[selectedCardCount])
-                
-                if currentNum >= userList.count {
-                    // 遷移処理
-                    performSegue(withIdentifier: "ToLikedList", sender: self)
-                }
+                likedName.append(userList[currentNum]["name"] as! String)
 
             } else {
                 // アニメーションをつける
@@ -253,11 +246,6 @@ class ViewController: UIViewController {
         
         // ユーザーカードを元に戻す
         setupNextView()
-
-        // 画面遷移
-        if currentNum >= userList.count {
-            performSegue(withIdentifier: "ToLikedList", sender: self)
-        }
     }
 
     // いいねボタン
@@ -268,17 +256,10 @@ class ViewController: UIViewController {
             self.cardList[self.selectedCardCount].center = CGPoint(x:self.cardList[self.selectedCardCount].center.x + 500, y:self.cardList[self.selectedCardCount].center.y)
         })
         // いいねリストに追加
-        likedName.append(nameList[selectedCardCount])
+        likedName.append(userList[currentNum]["name"] as! String)
         
         // ユーザーカードを元に戻す
         setupNextView()
-        
-        
-        
-        // 画面遷移
-        if currentNum >= userList.count {
-            performSegue(withIdentifier: "ToLikedList", sender: self)
-        }
     }
 }
 
