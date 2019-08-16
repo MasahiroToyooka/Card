@@ -48,7 +48,7 @@ class ViewController: UIViewController {
         ["name": "津田梅子", "job": "教師", "hometown": "千葉", "backgroundColor": #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)],
         ["name": "ジョージワシントン", "job": "大統領", "hometown": "アメリカ", "backgroundColor": #colorLiteral(red: 0.2196078449, green: 0.007843137719, blue: 0.8549019694, alpha: 1)],
         ["name": "ガリレオガリレイ", "job": "物理学者", "hometown": "イタリア", "backgroundColor": #colorLiteral(red: 0.8078431487, green: 0.02745098062, blue: 0.3333333433, alpha: 1)],
-        ["name": "板垣退助", "job": "議員", "hometown": "高知", "backgroundColor": #colorLiteral(red: 0.9764705896, green: 0.850980401, blue: 0.5490196347, alpha: 1)],
+        ["name": "板垣退助", "job": "議員", "hometown": "高知", "backgroundColor": #colorLiteral(red: 0.9995340705, green: 0.988355577, blue: 0.4726552367, alpha: 1)],
         ["name": "ジョン万次郎", "job": "冒険家", "hometown": "アメリカ", "backgroundColor": #colorLiteral(red: 0.4666666687, green: 0.7647058964, blue: 0.2666666806, alpha: 1)]
     ]
 
@@ -136,10 +136,11 @@ class ViewController: UIViewController {
         selectedCardNum += 1
         currentNum += 1
         
-        //
+        // 最後のやつで画面遷移させる
         if currentNum >= userList.count {
+            firstView.alpha = 0
             // 遷移処理
-            return performSegue(withIdentifier: "ToLikedList", sender: self)
+            performSegue(withIdentifier: "ToLikedList", sender: self)
         }
         selectedCardNum = currentNum % 2
     }
@@ -148,19 +149,21 @@ class ViewController: UIViewController {
     func setupCardData(indicateNum: Int, reset: Bool) {
         
         let userData: [String: Any] = userList[indicateNum]
-        
     
         if reset {
             // カード内容をリセットするやつ
             
             secondView.alpha = 1
+            firstView.alpha = 1
             
+            // firstViewのデータ更新
             firstImageView.image      = UIImage(named: userList[indicateNum]["name"] as! String)
             firstNameLabel.text       = userList[indicateNum]["name"] as? String
             firstJobLabel.text        = userList[indicateNum]["job"] as? String
             firstHomeTownLabel.text   = userList[indicateNum]["hometown"] as? String
             firstView.backgroundColor = userList[indicateNum]["backgroundColor"] as? UIColor
             
+            // secondViewのデータ更新
             secondImageView.image      = UIImage(named: userList[indicateNum + 1]["name"] as!                                String)
             secondNameLabel.text       = userList[indicateNum + 1]["name"] as? String
             secondJobLabel.text        = userList[indicateNum + 1]["job"] as? String
@@ -177,10 +180,11 @@ class ViewController: UIViewController {
                 
             } else {
                 // secondViewのデータ更新
-                secondImageView.image    = UIImage(named: userData["name"] as! String)
-                secondNameLabel.text     = userData["name"] as? String
-                secondJobLabel.text      = userData["job"] as? String
-                secondHomeTownLabel.text = userData["hometown"] as? String
+                secondImageView.image      = UIImage(named: userData["name"] as! String)
+                secondNameLabel.text       = userData["name"] as? String
+                secondJobLabel.text        = userData["job"] as? String
+                secondHomeTownLabel.text   = userData["hometown"] as? String
+                secondView.backgroundColor =  userData["backgroundColor"] as? UIColor
             }
         }
     }
@@ -268,31 +272,40 @@ class ViewController: UIViewController {
     }
 
     // よくないねボタン
-    @IBAction func dislikeButtonTapped(_ sender: Any) {
+    @IBAction func dislikeButtonTapped(_ sender: UIButton) {
 
+        sender.isEnabled = false
+        
         UIView.animate(withDuration: 0.5, animations: {
             // ベースカードをリセット
             self.resetCard()
             // ユーザーカードを左にとばす
             self.cardList[self.selectedCardNum].center = CGPoint(x:self.cardList[self.selectedCardNum].center.x - 500, y:self.cardList[self.selectedCardNum].center.y)
         })
-        
-        // ユーザーカードを元に戻す
-        setupNextView()
+        // 0.5秒のdelayをかける
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+            self.setupNextView()
+            sender.isEnabled = true
+        })
     }
 
     // いいねボタン
-    @IBAction func likeButtonTaped(_ sender: Any) {
+    @IBAction func likeButtonTaped(_ sender: UIButton) {
+
+        // いいねリストに追加
+        likedName.append(userList[currentNum]["name"] as! String)
+        sender.isEnabled = false
 
         UIView.animate(withDuration: 0.5, animations: {
             self.resetCard()
             self.cardList[self.selectedCardNum].center = CGPoint(x:self.cardList[self.selectedCardNum].center.x + 500, y:self.cardList[self.selectedCardNum].center.y)
         })
-        // いいねリストに追加
-        likedName.append(userList[currentNum]["name"] as! String)
-        
-        // ユーザーカードを元に戻す
-        setupNextView()
+
+        // 0.5秒のdelayをかける
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+            self.setupNextView()
+            sender.isEnabled = true
+        })
     }
 }
 
